@@ -24,7 +24,7 @@ class Catatan extends Equatable{
       "id" : id,
       "title" : title,
       "description" : description,
-      "waktu_pengingat" : waktuPengingat,
+      "waktu_pengingat" : waktuPengingat?.millisecondsSinceEpoch,
       "interval_pengingat" : intervalPengingat,
       "lampiran" : lampiran,
     };

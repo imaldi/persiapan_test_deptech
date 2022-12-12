@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:persiapan_test_deptech/data/datasource/local/dao/user_dao.dart';
+import 'package:persiapan_test_deptech/presentation/home_screen.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 
@@ -25,7 +26,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home:
+      const HomeScreen(),
+      // const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }

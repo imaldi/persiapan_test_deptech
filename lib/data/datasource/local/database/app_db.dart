@@ -4,6 +4,7 @@ import 'dart:core';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../../model/catatan.dart';
 import '../../../model/user.dart';
 class DB  {
 
@@ -30,7 +31,7 @@ class DB  {
           'CREATE TABLE users(id INTEGER PRIMARY KEY, nama_depan TEXT, nama_belakang TEXT, email TEXT, tanggal_lahir INTEGER, jenis_kelamin TEXT, password TEXT, foto_profil TEXT)',
         );
         await db.execute(
-          'CREATE TABLE catatan(id INTEGER PRIMARY KEY, judul TEXT, deskripsi TEXT, waktu_pengingat INTEGER, interval_pengingat INTEGER, lampiran TEXT)',
+          'CREATE TABLE catatan(id INTEGER PRIMARY KEY, title TEXT, description TEXT, waktu_pengingat INTEGER, interval_pengingat INTEGER, lampiran TEXT)',
         );
         await db.insert("users",
             User(
@@ -41,6 +42,16 @@ class DB  {
               jenisKelamin: "L",
               password: "abcde123",
             ).toMap());
+        var listCatatanRandom = List.generate(15, (index) => Catatan(title:"title $index", description: "description $index"));
+        // listCatatanRandom.forEach((element) async {
+        //   await db.insert("catatan", element.toMap());
+        // });
+        for(var catatan in listCatatanRandom){
+          await db.insert("catatan", catatan.toMap());
+          print("catatan element: ${catatan.toMap().toString()}");
+        }
+        var listCatatan = await db.query("catatan");
+        print("List Catatan from db: $listCatatan");
       },
       version: 1,
     );

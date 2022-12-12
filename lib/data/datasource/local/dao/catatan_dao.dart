@@ -50,23 +50,49 @@ class CatatanDao {
     );
   }
 
-  Future<List<Catatan>> catatanList()async {
+  Future<List<Catatan>> catatanList(void Function(void Function()) setState) async {
     // Get a reference to the database.
     final db = await DB.instance.database;
 
     // Query the table for all The Dogs.
-    final List<Map<String, dynamic>> maps = await db.query('catatan');
+    late final List<Map<String, dynamic>> maps;
+    wait() async {
+       maps = await db.query('catatan');
+    }
+    await wait();
+    print("List Catatan from dao: $maps");
+    late final List<Catatan> list;
+    setState((){
+      list = maps.map((e) => Catatan(
+        id: e['id'],
+        title: e['title'],
+        description: e['description'],
+        waktuPengingat: DateTime.fromMillisecondsSinceEpoch(e['waktu_pengingat']),
+        intervalPengingat: e['interval_pengingat'],
+        lampiran: e['lampiran'],
+      )).toList();
+    });
+
+
+
 
     // Convert the List<Map<String, dynamic> into a List<Dog>.
-    return List.generate(maps.length, (i) {
-      return Catatan(
-        id: maps[i]['id'],
-        title: maps[i]['title'],
-        description: maps[i]['description'],
-        waktuPengingat: DateTime.fromMillisecondsSinceEpoch(maps[i]['waktu_pengingat']),
-        intervalPengingat: maps[i]['interval_pengingat'],
-        lampiran: maps[i]['lampiran'],
-      );
-    });
+    return list;
+      // [
+      //   Catatan(title:"Title 1"),
+      //   Catatan(title:"Title 2"),
+      //   Catatan(title:"Title 3"),
+      // ];
+
+    //   List.generate(maps.length, (i) {
+    //   return Catatan(
+    //     id: maps[i]['id'],
+    //     title: maps[i]['title'],
+    //     description: maps[i]['description'],
+    //     waktuPengingat: DateTime.fromMillisecondsSinceEpoch(maps[i]['waktu_pengingat']),
+    //     intervalPengingat: maps[i]['interval_pengingat'],
+    //     lampiran: maps[i]['lampiran'],
+    //   );
+    // });
   }
 }
