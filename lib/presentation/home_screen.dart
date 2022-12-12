@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persiapan_test_deptech/data/datasource/local/dao/catatan_dao.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 
+import '../data/model/catatan.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -38,8 +40,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: state.catatanList?.length,
                     itemBuilder: (c, i) {
                       return ListTile(
+                        onTap: (){
+                        },
                         title: Text("${state.catatanList?[i].title}"),
                         subtitle: Text("${state.catatanList?[i].description}"),
+                        trailing: InkWell(
+                            onTap: (){
+                              c.read<CatatanCubit>().deleteCatatan(state.catatanList?[i].id ?? 0);
+                            },
+                            child: const Icon(Icons.delete)),
                       );
                     })
                 : const Center(
@@ -47,6 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context
+              .read<CatatanCubit>()
+              .addCatatan(Catatan(title: "HEEYY", description: "HUUUY"));
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
