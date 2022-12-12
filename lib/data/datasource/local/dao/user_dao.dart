@@ -43,4 +43,13 @@ class UserDao {
         returnedUser
       );
     }
+
+    Future<User?> login(String email, String password) async {
+      final db = await DB.instance.database;
+      var queryResults = await db.rawQuery("SELECT * FROM users WHERE email=? and password=?",[email,password]);
+      var returnedUser = queryResults.isNotEmpty ? queryResults.first : <String,dynamic>{};
+      return  returnedUser.isNotEmpty ? User.fromMap(
+          returnedUser
+      ) : null;
+    }
 }

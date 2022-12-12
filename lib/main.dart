@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persiapan_test_deptech/data/datasource/local/dao/user_dao.dart';
 import 'package:persiapan_test_deptech/presentation/screens/home_screen.dart';
+import 'package:persiapan_test_deptech/presentation/screens/login_screen.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
@@ -33,12 +34,13 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home:
-        Builder(
-          builder: (context) {
-            return const HomeScreen();
-          }
-        ),
+        home:const LoginScreen()
+        // Builder(
+        //   builder: (context) {
+        //     return const LoginScreen();
+        //     // return const HomeScreen();
+        //   }
+        // ),
         // const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
     );
