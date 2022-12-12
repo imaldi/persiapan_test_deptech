@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:persiapan_test_deptech/data/datasource/local/dao/user_dao.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart' as p;
 
-void main() {
+import 'data/model/user.dart';
+
+void main() async {
+  // Avoid errors caused by flutter upgrade.
+// Importing 'package:flutter/widgets.dart' is required.
+  WidgetsFlutterBinding.ensureInitialized();
+// Open the database and store the reference.
+
   runApp(const MyApp());
 }
 
@@ -30,12 +40,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late UserDao userDao;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    userDao = UserDao();
   }
 
   @override
@@ -49,20 +59,23 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'User:',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            FutureBuilder(
+              future: userDao.getLoggedInUser(1),
+              builder: (context, snapshot) {
+                return Text(
+                  '${snapshot.data}',
+                  style: Theme.of(context).textTheme.headline4,
+                );
+              }
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),// This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+
+// Define a function that inserts dogs into the database
+
