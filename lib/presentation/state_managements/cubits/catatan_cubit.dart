@@ -22,6 +22,13 @@ class CatatanCubit extends Cubit<CatatanState> {
     emit(CatatanState(catatanList: newList));
   }
 
+  editCatatan(Catatan catatan) async {
+    var catatanDao = CatatanDao();
+    await catatanDao.updateCatatan(catatan);
+    var newList = await catatanDao.catatanList();
+    emit(CatatanState(catatanList: newList));
+  }
+
   deleteCatatan(int id) async {
     var catatanDao = CatatanDao();
     await catatanDao.deleteCatatan(id);

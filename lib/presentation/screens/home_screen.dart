@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persiapan_test_deptech/data/datasource/local/dao/catatan_dao.dart';
+import 'package:persiapan_test_deptech/presentation/screens/add_or_edit_notes_screen.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 
-import '../data/model/catatan.dart';
+import '../../data/model/catatan.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -41,6 +42,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (c, i) {
                       return ListTile(
                         onTap: (){
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => AddOrEditNotesScreen(catatan: state.catatanList?[i],),
+                            ),
+                          );
                         },
                         title: Text("${state.catatanList?[i].title}"),
                         subtitle: Text("${state.catatanList?[i].description}"),
@@ -52,16 +58,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     })
                 : const Center(
-                    child: CircularProgressIndicator(),
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 16.0),
+                      child: Text("No Notes Found"),
+                    ),
                   );
           },
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context
-              .read<CatatanCubit>()
-              .addCatatan(Catatan(title: "HEEYY", description: "HUUUY"));
+          // context
+          //     .read<CatatanCubit>()
+          //     .addCatatan(Catatan(title: "HEEYY", description: "HUUUY"));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const AddOrEditNotesScreen(),
+            ),
+          );
         },
         child: const Icon(Icons.add),
       ),
