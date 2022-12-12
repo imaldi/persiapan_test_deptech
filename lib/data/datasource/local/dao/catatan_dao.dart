@@ -50,28 +50,21 @@ class CatatanDao {
     );
   }
 
-  Future<List<Catatan>> catatanList(void Function(void Function()) setState) async {
+  Future<List<Catatan>> catatanList() async {
     // Get a reference to the database.
     final db = await DB.instance.database;
 
     // Query the table for all The Dogs.
-    late final List<Map<String, dynamic>> maps;
-    wait() async {
-       maps = await db.query('catatan');
-    }
-    await wait();
+    final List<Map<String, dynamic>> maps = await db.query('catatan');
     print("List Catatan from dao: $maps");
-    late final List<Catatan> list;
-    setState((){
-      list = maps.map((e) => Catatan(
+    final List<Catatan>  list = maps.map((e) => Catatan(
         id: e['id'],
         title: e['title'],
         description: e['description'],
-        waktuPengingat: DateTime.fromMillisecondsSinceEpoch(e['waktu_pengingat']),
+        waktuPengingat: DateTime.fromMillisecondsSinceEpoch(e['waktu_pengingat'] ?? DateTime.now().millisecondsSinceEpoch),
         intervalPengingat: e['interval_pengingat'],
         lampiran: e['lampiran'],
       )).toList();
-    });
 
 
 

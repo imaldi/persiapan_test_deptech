@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persiapan_test_deptech/data/datasource/local/dao/catatan_dao.dart';
+import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -9,32 +11,43 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late CatatanDao catatanDao;
   @override
   void initState() {
-  super.initState();
-  catatanDao = CatatanDao();
+    super.initState();
+    context.read<CatatanCubit>().initList();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Note App"),),
-      body: SingleChildScrollView(child: FutureBuilder(
-        future: catatanDao.catatanList(setState),
-        builder: (c,snapshot){
-          return snapshot.hasData ?
+      appBar: AppBar(
+        title: const Text("Note App"),
+      ),
+      body: SingleChildScrollView(
+        child: Builder(
+          builder: (c) {
+            var state = c.watch<CatatanCubit>().state;
+            return (state.catatanList ?? []).isNotEmpty
+                ?
 
-            Text("${snapshot.data}") : const Center(child: CircularProgressIndicator(),);
-            // ListView.builder(
-            //   scrollDirection:Axis.vertical,
-            //   physics: const NeverScrollableScrollPhysics(),
-            //   shrinkWrap: true,
-            //   itemCount: snapshot.data?.length,
-            //   itemBuilder: (c,i){
-            //     return ListTile(title: Text("${snapshot.data?[i].title}"),subtitle: Text("${snapshot.data?[i].description}"),);
-            //   });
-        },
-      ),),
+                // Text("${state.catatanList}") : const Center(child: CircularProgressIndicator(),);
+                ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: state.catatanList?.length,
+                    itemBuilder: (c, i) {
+                      return ListTile(
+                        title: Text("${state.catatanList?[i].title}"),
+                        subtitle: Text("${state.catatanList?[i].description}"),
+                      );
+                    })
+                : const Center(
+                    child: CircularProgressIndicator(),
+                  );
+          },
+        ),
+      ),
     );
   }
 }

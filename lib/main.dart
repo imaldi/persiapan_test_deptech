@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persiapan_test_deptech/data/datasource/local/dao/user_dao.dart';
 import 'package:persiapan_test_deptech/presentation/home_screen.dart';
+import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 
@@ -21,14 +23,23 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_)=>CatatanCubit()),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home:
+        Builder(
+          builder: (context) {
+            return const HomeScreen();
+          }
+        ),
+        // const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      home:
-      const HomeScreen(),
-      // const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
