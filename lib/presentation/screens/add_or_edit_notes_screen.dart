@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:persiapan_test_deptech/core/consts/numbers.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 
+import '../../core/helper/duration_minute_to_human_readable.dart';
 import '../../data/model/catatan.dart';
+import '../widgets/my_file_picker.dart';
 
 class AddOrEditNotesScreen extends StatefulWidget {
   final Catatan? catatan;
@@ -19,19 +22,31 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
   var descController = TextEditingController();
   var pengingatDateController = TextEditingController();
   var intervalController = TextEditingController();
+  var hariController = TextEditingController();
+  var jamController = TextEditingController();
+  var menitController = TextEditingController();
   var isCreateNew = true;
   var isPengingat = false;
+  var filePath = "";
+  var reminderInterval = 0;
   DateTime? dateTimePengingat;
 
   @override
   void initState() {
     super.initState();
     isCreateNew = widget.catatan == null;
-    isPengingat = (widget.catatan?.waktuPengingat != null && widget.catatan?.intervalPengingat != null);
+    isPengingat = (widget.catatan?.waktuPengingat != null &&
+        widget.catatan?.intervalPengingat != null);
+    filePath = widget.catatan?.lampiran ?? "";
+    reminderInterval = widget.catatan?.intervalPengingat ?? 0;
     titleController.text = widget.catatan?.title ?? "";
     descController.text = widget.catatan?.description ?? "";
-    pengingatDateController.text = widget.catatan?.waktuPengingat.toString() == "null" ? "" : (widget.catatan?.waktuPengingat.toString() ?? "");
-    intervalController.text = (widget.catatan?.intervalPengingat ?? 0).toString() ?? "";
+    pengingatDateController.text =
+        widget.catatan?.waktuPengingat.toString() == "null"
+            ? ""
+            : (widget.catatan?.waktuPengingat.toString() ?? "");
+    intervalController.text =
+        (durationMinuteToHumanReadable(widget.catatan?.intervalPengingat ?? 0) ?? "").toString();
   }
 
   @override
@@ -68,6 +83,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                         Text(isCreateNew ? "Create new note" : "Update a note"),
                         TextFormField(
                             controller: titleController,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
                             validator: (val) {
                               if ((val ?? "").isEmpty) {
                                 return "Field ini tidak boleh kosong";
@@ -78,6 +94,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                 const InputDecoration(label: Text("Title"))),
                         TextFormField(
                           controller: descController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (val) {
                             if ((val ?? "").isEmpty) {
                               return "Field ini tidak boleh kosong";
@@ -89,48 +106,130 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                           minLines: 5,
                           maxLines: 5,
                         ),
-                            InkWell(
-                              onTap: isPengingat
-                                  ? () async {
-                                var res = await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(1990),
-                                    lastDate: DateTime(2100));
-                                if (res != null && isPengingat) {
-                                  pengingatDateController.text = res.toString();
-                                  dateTimePengingat = res;
+                        InkWell(
+                          onTap: isPengingat
+                              ? () async {
+                                  var res = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(1990),
+                                      lastDate: DateTime(2100));
+                                  if (res != null && isPengingat) {
+                                    pengingatDateController.text =
+                                        res.toString();
+                                    dateTimePengingat = res;
+                                  }
                                 }
-                              }
-                                  : null,
-                              child: Container(
-                                // padding: EdgeInsets.all(size_medium),
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(16),),
-                                child: TextFormField(
-                                    controller: pengingatDateController,
-                                    enabled: false,
-                                    validator: (val) {
-                                      if ((val ?? "").isEmpty && isPengingat) {
-                                        return "Field ini tidak boleh kosong";
-                                      }
-                                      return null;
-                                    },
-                                    decoration:
-                                    const InputDecoration(label: Text("Pengingat Date"))),
-                              ),
+                              : null,
+                          child: Container(
+                            // padding: EdgeInsets.all(size_medium),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                        TextFormField(
-                            controller: intervalController,
-                            keyboardType: TextInputType.number,
-                            enabled: isPengingat,
-                            validator: (val) {
-                              if ((val ?? "").isEmpty && isPengingat) {
-                                return "Field ini tidak boleh kosong";
-                              }
-                              return null;
-                            },
-                            decoration:
-                                const InputDecoration(label: Text("Interval Pengingat"))),
+                            child: TextFormField(
+                                controller: pengingatDateController,
+                                enabled: false,
+                                validator: (val) {
+                                  if ((val ?? "").isEmpty && isPengingat) {
+                                    return "Field ini tidak boleh kosong";
+                                  }
+                                  return null;
+                                },
+                                decoration: const InputDecoration(
+                                    label: Text("Pengingat Date"))),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: isPengingat ?  () async {
+                            await showDialog(
+                              context: context,
+                              builder: (c) {
+                                return AlertDialog(
+                                  title: const Text("Reminder Interval"),
+                                  content: IntrinsicHeight(
+                                    child: Column(
+                                      children: [
+                                        TextFormField(
+                                            controller: hariController,
+                                            keyboardType: TextInputType.number,
+                                            validator: (val) {
+                                              if ((val ?? "").isEmpty) {
+                                                return "Field ini tidak boleh kosong";
+                                              }
+                                              return null;
+                                            },
+                                            decoration: const InputDecoration(
+                                                label: Text("Hari"))),
+                                        TextFormField(
+                                            controller: jamController,
+                                            keyboardType: TextInputType.number,
+                                            validator: (val) {
+                                              if ((val ?? "").isEmpty) {
+                                                return "Field ini tidak boleh kosong";
+                                              }
+                                              return null;
+                                            },
+                                            decoration: const InputDecoration(
+                                                label: Text("Jam"))),
+                                        TextFormField(
+                                            controller: menitController,
+                                            keyboardType: TextInputType.number,
+                                            validator: (val) {
+                                              if ((val ?? "").isEmpty) {
+                                                return "Field ini tidak boleh kosong";
+                                              }
+                                              return null;
+                                            },
+                                            decoration: const InputDecoration(
+                                                label: Text("Menit"))),
+                                      ],
+                                    ),
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          reminderInterval = int.parse(hariController.text) * 24 * 60 + int.parse(jamController.text) * 60 + int.parse(menitController.text);
+                                          intervalController.text = durationMinuteToHumanReadable(reminderInterval);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text("OK")),
+                                    // Text("Oke"),
+                                  ],
+                                  actionsAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                );
+                              },
+                            );
+                          } : null,
+                          child: TextFormField(
+                              controller: intervalController,
+                              keyboardType: TextInputType.number,
+                              // enabled: isPengingat,
+                              enabled: false,
+                              onTap: null,
+                              validator: (val) {
+                                if ((val ?? "").isEmpty && isPengingat) {
+                                  return "Field ini tidak boleh kosong";
+                                }
+                                return null;
+                              },
+                              decoration: const InputDecoration(
+                                  label: Text("Interval Pengingat"))),
+                        ),
+                        Row(
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: sizeMedium),
+                              child: Text("Lampiran",style: TextStyle(fontSize: sizeMedium),),
+                            ),
+                          ],
+                        ),
+                        MyFilePickerWidget((theFile){
+                          setState((){
+                            filePath = theFile?.path ?? "";
+                          });
+                        }),
+                        Text("filePath: $filePath"),
                         ElevatedButton(
                             onPressed: () {
                               if ((formKey.currentState?.validate() ?? false)) {
@@ -139,8 +238,13 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                     id: widget.catatan?.id,
                                     title: titleController.text,
                                     description: descController.text,
-                                    waktuPengingat: isPengingat ? dateTimePengingat : null,
-                                    intervalPengingat: int.parse(intervalController.text)
+                                    waktuPengingat:
+                                        isPengingat ? dateTimePengingat : null,
+                                    intervalPengingat:
+                                    reminderInterval,
+                                    // intervalController.text.isNotEmpty ?
+                                    //     int.parse(intervalController.text) : null,
+                                  lampiran: filePath,
                                 );
                                 isCreateNew
                                     ? context
@@ -150,62 +254,13 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                         .read<CatatanCubit>()
                                         .editCatatan(responseToSend);
                                 Navigator.of(context).pop();
+                              } else {
+
                               }
                             },
                             child:
                                 Text("${isCreateNew ? "Add" : "Update"} Note"))
                       ])
-                      // Container(
-                      //     margin: const EdgeInsets.symmetric(vertical: 16),
-                      //     child: BlocListener<PostsBloc, PostsState>(
-                      //       listener: (context, state) {
-                      //         if (state is CreatePostsSuccess) {
-                      //           myToast("Success Creating Post");
-                      //           Navigator.of(context).pop();
-                      //         }
-                      //
-                      //         if (state is UpdatePostsSuccess) {
-                      //           myToast("Success Update Post");
-                      //           Navigator.of(context).pop();
-                      //         }
-                      //
-                      //         if (state is CreatePostsFailed) {
-                      //           myToast("Failed Creating Post: ${state.errorMessage}");
-                      //         }
-                      //
-                      //         if (state is UpdatePostsFailed) {
-                      //           myToast("Failed Updating Post: ${state.errorMessage}");
-                      //         }
-                      //       },
-                      //       child: BlocBuilder<PostsBloc, PostsState>(
-                      //         builder: (context, state) {
-                      //           if(state is LoadingPosts){
-                      //             return const CircularProgressIndicator();
-                      //           }
-                      //           return ElevatedButton(
-                      //               onPressed: () {
-                      //                 if ((formKey.currentState?.validate() ??
-                      //                     false)) {
-                      //                   formKey.currentState?.save();
-                      //                   var responseToSend = PostsResponse(
-                      //                       id: widget.postsResponse?.id ?? 1,
-                      //                       userId: 1,
-                      //                       title: titleController.text,
-                      //                       body: descController.text);
-                      //                   var eventToAdd =
-                      //                   widget.postsResponse == null
-                      //                       ? CreateAPosts(responseToSend)
-                      //                       : UpdateAPosts(responseToSend);
-                      //                   context
-                      //                       .read<PostsBloc>()
-                      //                       .add(eventToAdd);
-                      //                 }
-                      //               },
-                      //               child: Text(
-                      //                   "${widget.postsResponse == null ? "Create" : "Update"} Post"));
-                      //         },
-                      //       ),
-                      //     ))
                       ),
                 ),
               ),
