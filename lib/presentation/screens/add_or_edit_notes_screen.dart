@@ -30,8 +30,8 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
     isPengingat = (widget.catatan?.waktuPengingat != null && widget.catatan?.intervalPengingat != null);
     titleController.text = widget.catatan?.title ?? "";
     descController.text = widget.catatan?.description ?? "";
-    pengingatDateController.text = widget.catatan?.waktuPengingat.toString() ?? "";
-    intervalController.text = widget.catatan?.intervalPengingat.toString() ?? "";
+    pengingatDateController.text = widget.catatan?.waktuPengingat.toString() == "null" ? "" : (widget.catatan?.waktuPengingat.toString() ?? "");
+    intervalController.text = (widget.catatan?.intervalPengingat ?? 0).toString() ?? "";
   }
 
   @override
@@ -97,7 +97,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                     initialDate: DateTime.now(),
                                     firstDate: DateTime(1990),
                                     lastDate: DateTime(2100));
-                                if (res != null) {
+                                if (res != null && isPengingat) {
                                   pengingatDateController.text = res.toString();
                                   dateTimePengingat = res;
                                 }
@@ -110,7 +110,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                     controller: pengingatDateController,
                                     enabled: false,
                                     validator: (val) {
-                                      if ((val ?? "").isEmpty) {
+                                      if ((val ?? "").isEmpty && isPengingat) {
                                         return "Field ini tidak boleh kosong";
                                       }
                                       return null;
@@ -136,10 +136,10 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                               if ((formKey.currentState?.validate() ?? false)) {
                                 formKey.currentState?.save();
                                 var responseToSend = Catatan(
-                                    id: widget.catatan?.id ?? 0,
+                                    id: widget.catatan?.id,
                                     title: titleController.text,
                                     description: descController.text,
-                                    waktuPengingat: dateTimePengingat,
+                                    waktuPengingat: isPengingat ? dateTimePengingat : null,
                                     intervalPengingat: int.parse(intervalController.text)
                                 );
                                 isCreateNew

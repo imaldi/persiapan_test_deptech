@@ -61,7 +61,7 @@ class CatatanDao {
         id: e['id'],
         title: e['title'],
         description: e['description'],
-        waktuPengingat: DateTime.fromMillisecondsSinceEpoch(e['waktu_pengingat'] ?? DateTime.now().millisecondsSinceEpoch),
+        waktuPengingat: e['waktu_pengingat'] != null ? DateTime.fromMillisecondsSinceEpoch(e['waktu_pengingat']) : null,
         intervalPengingat: e['interval_pengingat'],
         lampiran: e['lampiran'],
       )).toList();
