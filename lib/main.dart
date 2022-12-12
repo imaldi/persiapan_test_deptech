@@ -28,7 +28,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_)=>CatatanCubit()),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Note App',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),

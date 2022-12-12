@@ -18,6 +18,7 @@ class AddOrEditNotesScreen extends StatefulWidget {
 
 class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
   var formKey = GlobalKey<FormState>();
+  var durationKey = GlobalKey<FormState>();
   var titleController = TextEditingController();
   var descController = TextEditingController();
   var pengingatDateController = TextEditingController();
@@ -45,8 +46,10 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
         widget.catatan?.waktuPengingat.toString() == "null"
             ? ""
             : (widget.catatan?.waktuPengingat.toString() ?? "");
-    intervalController.text =
-        (durationMinuteToHumanReadable(widget.catatan?.intervalPengingat ?? 0) ?? "").toString();
+    intervalController.text = (durationMinuteToHumanReadable(
+                widget.catatan?.intervalPengingat ?? 0) ??
+            "")
+        .toString();
   }
 
   @override
@@ -83,7 +86,8 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                         Text(isCreateNew ? "Create new note" : "Update a note"),
                         TextFormField(
                             controller: titleController,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             validator: (val) {
                               if ((val ?? "").isEmpty) {
                                 return "Field ini tidak boleh kosong";
@@ -109,6 +113,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                         InkWell(
                           onTap: isPengingat
                               ? () async {
+                                  FocusScope.of(context).unfocus();
                                   var res = await showDatePicker(
                                       context: context,
                                       initialDate: DateTime.now(),
@@ -140,73 +145,129 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                           ),
                         ),
                         InkWell(
-                          onTap: isPengingat ?  () async {
-                            await showDialog(
-                              context: context,
-                              builder: (c) {
-                                return AlertDialog(
-                                  title: const Text("Reminder Interval"),
-                                  content: IntrinsicHeight(
-                                    child: Column(
-                                      children: [
-                                        TextFormField(
-                                            controller: hariController,
-                                            keyboardType: TextInputType.number,
-                                            validator: (val) {
-                                              if ((val ?? "").isEmpty) {
-                                                return "Field ini tidak boleh kosong";
-                                              }
-                                              return null;
-                                            },
-                                            decoration: const InputDecoration(
-                                                label: Text("Hari"))),
-                                        TextFormField(
-                                            controller: jamController,
-                                            keyboardType: TextInputType.number,
-                                            validator: (val) {
-                                              if ((val ?? "").isEmpty) {
-                                                return "Field ini tidak boleh kosong";
-                                              }
-                                              return null;
-                                            },
-                                            decoration: const InputDecoration(
-                                                label: Text("Jam"))),
-                                        TextFormField(
-                                            controller: menitController,
-                                            keyboardType: TextInputType.number,
-                                            validator: (val) {
-                                              if ((val ?? "").isEmpty) {
-                                                return "Field ini tidak boleh kosong";
-                                              }
-                                              return null;
-                                            },
-                                            decoration: const InputDecoration(
-                                                label: Text("Menit"))),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: [
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          reminderInterval = int.parse(hariController.text) * 24 * 60 + int.parse(jamController.text) * 60 + int.parse(menitController.text);
-                                          intervalController.text = durationMinuteToHumanReadable(reminderInterval);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text("OK")),
-                                    // Text("Oke"),
-                                  ],
-                                  actionsAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                );
-                              },
-                            );
-                          } : null,
+                          onTap: isPengingat
+                              ? () async {
+                                  FocusScope.of(context).unfocus();
+                                  await showDialog(
+                                    context: context,
+                                    builder: (c) {
+                                      return AlertDialog(
+                                        title: const Text("Reminder Interval"),
+                                        content: Form(
+                                          key: durationKey,
+                                          child: IntrinsicHeight(
+                                            child: Column(
+                                              children: [
+                                                TextFormField(
+                                                    controller: hariController,
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    validator: (val) {
+                                                      if ((val ?? "").isEmpty) {
+                                                        return "Field ini tidak boleh kosong";
+                                                      }
+                                                      return null;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                            label:
+                                                                Text("Hari"))),
+                                                TextFormField(
+                                                    controller: jamController,
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    autovalidateMode:
+                                                        AutovalidateMode
+                                                            .onUserInteraction,
+                                                    validator: (val) {
+                                                      if ((val ?? "").isEmpty) {
+                                                        return "Field ini tidak boleh kosong";
+                                                      }
+                                                      if (int.parse(
+                                                                  val ?? "0") >=
+                                                              24 ||
+                                                          int.parse(
+                                                                  val ?? "0") <
+                                                              0) {
+                                                        return "Durasi jam hanya dari 0 - 23";
+                                                      }
+                                                      return null;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                            label:
+                                                                Text("Jam"))),
+                                                TextFormField(
+                                                    controller: menitController,
+                                                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    validator: (val) {
+                                                      if ((val ?? "").isEmpty) {
+                                                        return "Field ini tidak boleh kosong";
+                                                      }
+                                                      if (int.parse(
+                                                          val ?? "0") >=
+                                                          60 ||
+                                                          int.parse(
+                                                              val ?? "0") <
+                                                              0) {
+                                                        return "Durasi menit hanya dari 0 - 59";
+                                                      }
+                                                      return null;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                            label:
+                                                                Text("Menit"))),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        actions: [
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                if ((durationKey.currentState
+                                                        ?.validate() ??
+                                                    false)) {
+                                                  durationKey.currentState?.save();
+                                                reminderInterval = int.parse(
+                                                            hariController
+                                                                .text) *
+                                                        24 *
+                                                        60 +
+                                                    int.parse(jamController
+                                                            .text) *
+                                                        60 +
+                                                    int.parse(
+                                                        menitController.text);
+                                                intervalController.text =
+                                                    durationMinuteToHumanReadable(
+                                                        reminderInterval);
+                                                Navigator.of(context).pop();
+                                                } else {
+                                                  jamController.text = "";
+                                                  menitController.text = "";
+                                                }
+                                              },
+                                              child: Text("OK")),
+                                          // Text("Oke"),
+                                        ],
+                                        actionsAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                      );
+                                    },
+                                  );
+                                }
+                              : null,
                           child: TextFormField(
                               controller: intervalController,
                               keyboardType: TextInputType.number,
                               // enabled: isPengingat,
                               enabled: false,
-                              onTap: null,
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                              },
                               validator: (val) {
                                 if ((val ?? "").isEmpty && isPengingat) {
                                   return "Field ini tidak boleh kosong";
@@ -219,31 +280,36 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                         Row(
                           children: const [
                             Padding(
-                              padding: EdgeInsets.symmetric(vertical: sizeMedium),
-                              child: Text("Lampiran",style: TextStyle(fontSize: sizeMedium),),
+                              padding:
+                                  EdgeInsets.symmetric(vertical: sizeMedium),
+                              child: Text(
+                                "Lampiran",
+                                style: TextStyle(fontSize: sizeMedium),
+                              ),
                             ),
                           ],
                         ),
-                        MyFilePickerWidget((theFile){
-                          setState((){
+                        MyFilePickerWidget((theFile) {
+                          setState(() {
                             filePath = theFile?.path ?? "";
                           });
-                        }),
-                        Text("filePath: $filePath"),
+                        },
+                        fileURL: filePath,
+                        ),
+                        // Text("filePath: $filePath"),
                         ElevatedButton(
                             onPressed: () {
                               if ((formKey.currentState?.validate() ?? false)) {
                                 formKey.currentState?.save();
                                 var responseToSend = Catatan(
-                                    id: widget.catatan?.id,
-                                    title: titleController.text,
-                                    description: descController.text,
-                                    waktuPengingat:
-                                        isPengingat ? dateTimePengingat : null,
-                                    intervalPengingat:
-                                    reminderInterval,
-                                    // intervalController.text.isNotEmpty ?
-                                    //     int.parse(intervalController.text) : null,
+                                  id: widget.catatan?.id,
+                                  title: titleController.text,
+                                  description: descController.text,
+                                  waktuPengingat:
+                                      isPengingat ? dateTimePengingat : null,
+                                  intervalPengingat: reminderInterval,
+                                  // intervalController.text.isNotEmpty ?
+                                  //     int.parse(intervalController.text) : null,
                                   lampiran: filePath,
                                 );
                                 isCreateNew
@@ -254,14 +320,11 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                         .read<CatatanCubit>()
                                         .editCatatan(responseToSend);
                                 Navigator.of(context).pop();
-                              } else {
-
-                              }
+                              } else {}
                             },
                             child:
                                 Text("${isCreateNew ? "Add" : "Update"} Note"))
-                      ])
-                      ),
+                      ])),
                 ),
               ),
             ),
