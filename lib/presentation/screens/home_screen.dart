@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:persiapan_test_deptech/data/datasource/local/dao/catatan_dao.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:persiapan_test_deptech/presentation/screens/add_or_edit_notes_screen.dart';
+import 'package:persiapan_test_deptech/presentation/state_managements/cubits/auth_cubit/auth_cubit.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 
 import '../../data/model/catatan.dart';
+import '../../data/model/user.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -14,17 +16,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late User user;
   @override
   void initState() {
     super.initState();
     context.read<CatatanCubit>().initList();
+    user = context.read<AuthCubit>().state.user ?? const User(namaDepan: "Guest");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Note App"),
+        title: Text("Note App of ${user.namaDepan}"),
       ),
       body: SingleChildScrollView(
         child: Builder(

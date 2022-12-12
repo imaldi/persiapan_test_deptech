@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:persiapan_test_deptech/data/datasource/local/dao/user_dao.dart';
 import 'package:persiapan_test_deptech/presentation/screens/home_screen.dart';
+import 'package:persiapan_test_deptech/presentation/state_managements/cubits/auth_cubit/auth_cubit.dart';
 import 'package:persiapan_test_deptech/presentation/widgets/my_toast.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -69,11 +72,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                     false)) {
                                   formKey.currentState?.save();
                                   /// TODO check db and then set session
-                                  var userDao = UserDao();
-                                  var loggedInUser = await userDao.login(emailController.text, passwordController.text);
+
+
+                                  var loggedInUser = await context.read<AuthCubit>().login(emailController.text, passwordController.text);
                                   if(loggedInUser == null){
                                     myToast("Email atau Password salah");
                                   } else {
+                                    final LocalStorage storage = LocalStorage('note_app');
+                                    await storage.setItem('logged_in_user', loggedInUser.toMap());
+                                    emailController.clear();
+                                    passwordController.clear();
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (context) => const HomeScreen(),
