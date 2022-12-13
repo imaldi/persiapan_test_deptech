@@ -42,8 +42,8 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
     filePath = widget.catatan?.lampiran ?? "";
     reminderIntervalInMinute = (widget.catatan?.intervalPengingat ?? 0) ~/ 60;
     dateTimePengingat = widget.catatan?.waktuPengingat;
-    myToast("reminder Init: $reminderIntervalInMinute");
-    myToast("reminder Init readable: ${durationMinuteToHumanReadable(reminderIntervalInMinute)}");
+    // myToast("reminder Init: $reminderIntervalInMinute");
+    // myToast("reminder Init readable: ${durationMinuteToHumanReadable(reminderIntervalInMinute)}");
     titleController.text = widget.catatan?.title ?? "";
     descController.text = widget.catatan?.description ?? "";
     pengingatDateController.text =
