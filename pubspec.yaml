@@ -37,6 +37,7 @@ dependencies:
   equatable: ^2.0.5
   flutter_bloc: ^8.1.1
   file_picker: ^5.2.4
+  image_picker: ^0.8.6
   fluttertoast: ^8.1.2
 
 

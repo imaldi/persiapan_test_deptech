@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:localstorage/localstorage.dart';
@@ -24,7 +26,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> updateUser(User user) async {
     var userDao = UserDao();
     await userDao.updateUser(user);
-    login(user.email!, user.password!);
+    var newUser = await login(user.email!,user.password!);
+    emit(AuthState(user: newUser ?? User()));
   }
 
   Future<void> checkLogin(Function() onLoggedIn) async {

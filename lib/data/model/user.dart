@@ -46,7 +46,7 @@ class User extends Equatable {
         tanggalLahir: DateTime.fromMillisecondsSinceEpoch(theMap["tanggal_lahir"]),
         jenisKelamin: theMap["jenis_kelamin"],
         password: theMap["password"],
-        fotoProfil: theMap["foto_profil_path"],
+        fotoProfil: theMap["foto_profil"],
       );
   }
 
