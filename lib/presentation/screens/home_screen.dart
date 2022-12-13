@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:persiapan_test_deptech/core/consts/numbers.dart';
 import 'package:persiapan_test_deptech/presentation/screens/add_or_edit_notes_screen.dart';
+import 'package:persiapan_test_deptech/presentation/screens/profile_screen.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/auth_cubit/auth_cubit.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 
@@ -29,6 +31,21 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Note App of ${user.namaDepan}"),
+        actions: [
+          InkWell(
+            onTap: (){
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ProfileScreen(),
+                ),
+              );
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: sizeMedium),
+              child: Icon(Icons.person),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Builder(

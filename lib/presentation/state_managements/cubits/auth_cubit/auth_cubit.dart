@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:localstorage/localstorage.dart';
 
 import '../../../../data/datasource/local/dao/user_dao.dart';
 import '../../../../data/model/user.dart';
@@ -12,11 +13,21 @@ class AuthCubit extends Cubit<AuthState> {
   Future<User?> login(String email, String password) async {
     var userDao = UserDao();
     var loggedInUser = await userDao.login(email, password);
+    final LocalStorage storage = LocalStorage('note_app');
+    if(loggedInUser != null){
+      await storage.setItem('logged_in_user', loggedInUser.toMap());
+    }
     emit(AuthState(user: loggedInUser));
     return state.user;
   }
 
-  // Future<User> getLoggedInUser() {
-  //
-  // }
+  Future<void> checkLogin(Function() onLoggedIn) async {
+    final LocalStorage storage = LocalStorage('note_app');
+    await storage.ready;
+    Map<String, dynamic> userMap = storage.getItem('logged_in_user') ?? {};
+    if(userMap.isNotEmpty) {
+      emit(AuthState(user: User.fromMap(userMap)));
+      onLoggedIn();
+    }
+  }
 }
