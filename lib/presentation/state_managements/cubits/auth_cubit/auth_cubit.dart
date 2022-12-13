@@ -21,6 +21,12 @@ class AuthCubit extends Cubit<AuthState> {
     return state.user;
   }
 
+  Future<void> updateUser(User user) async {
+    var userDao = UserDao();
+    await userDao.updateUser(user);
+    login(user.email!, user.password!);
+  }
+
   Future<void> checkLogin(Function() onLoggedIn) async {
     final LocalStorage storage = LocalStorage('note_app');
     await storage.ready;
