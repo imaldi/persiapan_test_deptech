@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:persiapan_test_deptech/core/consts/numbers.dart';
 import 'package:persiapan_test_deptech/presentation/screens/add_or_edit_notes_screen.dart';
+import 'package:persiapan_test_deptech/presentation/screens/login_screen.dart';
 import 'package:persiapan_test_deptech/presentation/screens/profile_screen.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/auth_cubit/auth_cubit.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
@@ -43,6 +44,20 @@ class _HomeScreenState extends State<HomeScreen> {
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: sizeMedium),
               child: Icon(Icons.person),
+            ),
+          ),
+          InkWell(
+            onTap: (){
+              context.read<AuthCubit>().logOut();
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+              );
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: sizeMedium),
+              child: Icon(Icons.logout),
             ),
           )
         ],

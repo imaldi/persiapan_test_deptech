@@ -42,16 +42,6 @@ class DB  {
               jenisKelamin: "L",
               password: "abcde123",
             ).toMap());
-        var listCatatanRandom = List.generate(15, (index) => Catatan(title:"title $index", description: "description $index"));
-        // listCatatanRandom.forEach((element) async {
-        //   await db.insert("catatan", element.toMap());
-        // });
-        for(var catatan in listCatatanRandom){
-          await db.insert("catatan", catatan.toMap());
-          print("catatan element: ${catatan.toMap().toString()}");
-        }
-        var listCatatan = await db.query("catatan");
-        print("List Catatan from db: $listCatatan");
       },
       version: 1,
     );

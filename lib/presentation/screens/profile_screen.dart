@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persiapan_test_deptech/data/model/user.dart';
@@ -6,6 +8,8 @@ import 'package:persiapan_test_deptech/presentation/widgets/my_image_picker/my_i
 import 'package:persiapan_test_deptech/presentation/widgets/my_toast.dart';
 
 import '../../core/consts/numbers.dart';
+import 'package:path/path.dart' as p;
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -59,6 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MyImagePickerWidget(
                             (theImage) {
                               fotoProfilController.text = theImage?.path ?? "";
+                              context.read<AuthCubit>().saveFile(File(theImage?.path ?? ""));
                             },
                             localImageURL: fotoProfilController.text,
                             customDefaultIcon: Icon(
@@ -164,22 +169,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text("Wanita")
                     ],
                   ),
-                  // TextFormField(
-                  //     controller: fotoProfilController,
-                  //     autovalidateMode: AutovalidateMode.onUserInteraction,
-                  //     validator: (val) {
-                  //       if ((val ?? "").isEmpty) {
-                  //         return "Field ini tidak boleh kosong";
-                  //       }
-                  //       return null;
-                  //     },
-                  //     decoration:
-                  //         const InputDecoration(label: Text("Foto Profil"))),
+                  TextFormField(
+                      controller: fotoProfilController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (val) {
+                        if ((val ?? "").isEmpty) {
+                          return "Field ini tidak boleh kosong";
+                        }
+                        return null;
+                      },
+                      decoration:
+                          const InputDecoration(label: Text("Foto Profil"))),
                   ElevatedButton(
                       onPressed: () {
                         context.read<AuthCubit>().updateUser(
                                 // context.read<AuthCubit>().state.user ??
-                                User(
+                            context.read<AuthCubit>().state.user?.copyWith(
                               id: context.read<AuthCubit>().state.user?.id ?? 0,
                               namaDepan: namaDepanController.text,
                               namaBelakang: namaBelakangController.text,
@@ -187,8 +192,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               tanggalLahir: tanggalLahir,
                               password: context.read<AuthCubit>().state.user?.password ?? "",
                               jenisKelamin: jenisKelaminController.text,
-                              fotoProfil: fotoProfilController.text,
-                            ));
+                              // fotoProfil: fotoProfilController.text,
+                            ) ?? const User());
                         myToast("Success Edit Profile");
                         Navigator.of(context).pop();
                       },

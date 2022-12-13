@@ -6,7 +6,6 @@ import 'package:persiapan_test_deptech/presentation/screens/login_screen.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/auth_cubit/auth_cubit.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' as p;
 
 import 'data/model/user.dart';
 

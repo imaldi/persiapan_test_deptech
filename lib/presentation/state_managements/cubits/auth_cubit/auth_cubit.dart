@@ -1,8 +1,8 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 import '../../../../data/datasource/local/dao/user_dao.dart';
 import '../../../../data/model/user.dart';
@@ -38,5 +38,18 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthState(user: User.fromMap(userMap)));
       onLoggedIn();
     }
+  }
+  Future<void> saveFile(File file) async {
+    print("Old Path: ${file.path}");
+    Directory appDocumentsDirectory = await getApplicationDocumentsDirectory(); // 1
+    String appDocumentsPath = appDocumentsDirectory.path; // 2
+    var savedFile = await file.copy('${appDocumentsPath}/user_profile.jpg');
+    print("New Path: ${savedFile.path}");
+    emit(AuthState(user: state.user?.copyWith(fotoProfil: savedFile.path)));
+  }
+
+  Future<void> logOut() async {
+    final LocalStorage storage = LocalStorage('note_app');
+    storage.clear();
   }
 }
