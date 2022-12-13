@@ -41,16 +41,15 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
         widget.catatan?.intervalPengingat != null);
     filePath = widget.catatan?.lampiran ?? "";
     reminderIntervalInMinute = (widget.catatan?.intervalPengingat ?? 0) ~/ 60;
+    dateTimePengingat = widget.catatan?.waktuPengingat;
+    myToast("reminder Init: $reminderIntervalInMinute");
+    myToast("reminder Init readable: ${durationMinuteToHumanReadable(reminderIntervalInMinute)}");
     titleController.text = widget.catatan?.title ?? "";
     descController.text = widget.catatan?.description ?? "";
     pengingatDateController.text =
         widget.catatan?.waktuPengingat.toString() == "null"
             ? ""
             : (widget.catatan?.waktuPengingat.toString() ?? "");
-    intervalController.text = (durationMinuteToHumanReadable(
-                widget.catatan?.intervalPengingat ?? 0) ??
-            "")
-        .toString();
   }
 
   @override
@@ -160,10 +159,13 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                   DropdownMenuItem(child: Text("1 Hari Sebelumnya"),value: 60*24,),
                                   DropdownMenuItem(child: Text("3 Jam Sebelumnya"),value: 180,),
                                   DropdownMenuItem(child: Text("1 Jam Sebelumnya"),value: 60,),
-                                ], onChanged: (val){
-                                  reminderIntervalInMinute = val ?? 0;
-                                  myToast("reminderIntervalInMinute: $reminderIntervalInMinute");
-                            }),
+                                ], onChanged: isPengingat ? (val){
+                                  setState((){
+                                    reminderIntervalInMinute = val ?? 0;
+
+                                  });
+                                  // myToast("reminderIntervalInMinute: $reminderIntervalInMinute");
+                            }: null),
                           ],
                         ),
                         Row(
@@ -196,7 +198,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                   description: descController.text,
                                   waktuPengingat:
                                       isPengingat ? dateTimePengingat : null,
-                                  intervalPengingat: reminderIntervalInMinute * 60,
+                                  intervalPengingat: isPengingat ? reminderIntervalInMinute * 60  : null,
                                   // intervalController.text.isNotEmpty ?
                                   //     int.parse(intervalController.text) : null,
                                   lampiran: filePath,
@@ -208,7 +210,13 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                     : context
                                         .read<CatatanCubit>()
                                         .editCatatan(responseToSend);
-                                myToast("Reminder in ${durationMinuteToHumanReadable(reminderIntervalInMinute)}");
+                                if(reminderIntervalInMinute > 0){
+                                  // popUpReminder((responseToSend.intervalPengingat ?? 0) ~/ 60);
+                                  durationMinuteToHumanReadable((responseToSend.intervalPengingat ?? 0) ~/ 60,callback: (val){
+                                    myToast("Reminder in $val");
+                                  });
+
+                                }
                                 Navigator.of(context).pop();
                               } else {}
                             },
