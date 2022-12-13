@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persiapan_test_deptech/core/consts/numbers.dart';
 import 'package:persiapan_test_deptech/presentation/state_managements/cubits/catatan_cubit.dart';
+import 'package:persiapan_test_deptech/presentation/widgets/my_toast.dart';
 
 import '../../core/helper/duration_minute_to_human_readable.dart';
 import '../../data/model/catatan.dart';
@@ -29,7 +30,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
   var isCreateNew = true;
   var isPengingat = false;
   var filePath = "";
-  var reminderInterval = 0;
+  var reminderIntervalInMinute = 0;
   DateTime? dateTimePengingat;
 
   @override
@@ -39,7 +40,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
     isPengingat = (widget.catatan?.waktuPengingat != null &&
         widget.catatan?.intervalPengingat != null);
     filePath = widget.catatan?.lampiran ?? "";
-    reminderInterval = widget.catatan?.intervalPengingat ?? 0;
+    reminderIntervalInMinute = (widget.catatan?.intervalPengingat ?? 0) ~/ 60;
     titleController.text = widget.catatan?.title ?? "";
     descController.text = widget.catatan?.description ?? "";
     pengingatDateController.text =
@@ -144,138 +145,26 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                     label: Text("Pengingat Date"))),
                           ),
                         ),
-                        InkWell(
-                          onTap: isPengingat
-                              ? () async {
-                                  FocusScope.of(context).unfocus();
-                                  await showDialog(
-                                    context: context,
-                                    builder: (c) {
-                                      return AlertDialog(
-                                        title: const Text("Reminder Interval"),
-                                        content: Form(
-                                          key: durationKey,
-                                          child: IntrinsicHeight(
-                                            child: Column(
-                                              children: [
-                                                TextFormField(
-                                                    controller: hariController,
-                                                    keyboardType:
-                                                        TextInputType.number,
-                                                    validator: (val) {
-                                                      if ((val ?? "").isEmpty) {
-                                                        return "Field ini tidak boleh kosong";
-                                                      }
-                                                      return null;
-                                                    },
-                                                    decoration:
-                                                        const InputDecoration(
-                                                            label:
-                                                                Text("Hari"))),
-                                                TextFormField(
-                                                    controller: jamController,
-                                                    keyboardType:
-                                                        TextInputType.number,
-                                                    autovalidateMode:
-                                                        AutovalidateMode
-                                                            .onUserInteraction,
-                                                    validator: (val) {
-                                                      if ((val ?? "").isEmpty) {
-                                                        return "Field ini tidak boleh kosong";
-                                                      }
-                                                      if (int.parse(
-                                                                  val ?? "0") >=
-                                                              24 ||
-                                                          int.parse(
-                                                                  val ?? "0") <
-                                                              0) {
-                                                        return "Durasi jam hanya dari 0 - 23";
-                                                      }
-                                                      return null;
-                                                    },
-                                                    decoration:
-                                                        const InputDecoration(
-                                                            label:
-                                                                Text("Jam"))),
-                                                TextFormField(
-                                                    controller: menitController,
-                                                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                                                    keyboardType:
-                                                        TextInputType.number,
-                                                    validator: (val) {
-                                                      if ((val ?? "").isEmpty) {
-                                                        return "Field ini tidak boleh kosong";
-                                                      }
-                                                      if (int.parse(
-                                                          val ?? "0") >=
-                                                          60 ||
-                                                          int.parse(
-                                                              val ?? "0") <
-                                                              0) {
-                                                        return "Durasi menit hanya dari 0 - 59";
-                                                      }
-                                                      return null;
-                                                    },
-                                                    decoration:
-                                                        const InputDecoration(
-                                                            label:
-                                                                Text("Menit"))),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        actions: [
-                                          ElevatedButton(
-                                              onPressed: () {
-                                                if ((durationKey.currentState
-                                                        ?.validate() ??
-                                                    false)) {
-                                                  durationKey.currentState?.save();
-                                                reminderInterval = int.parse(
-                                                            hariController
-                                                                .text) *
-                                                        24 *
-                                                        60 +
-                                                    int.parse(jamController
-                                                            .text) *
-                                                        60 +
-                                                    int.parse(
-                                                        menitController.text);
-                                                intervalController.text =
-                                                    durationMinuteToHumanReadable(
-                                                        reminderInterval);
-                                                Navigator.of(context).pop();
-                                                } else {
-                                                  jamController.text = "";
-                                                  menitController.text = "";
-                                                }
-                                              },
-                                              child: Text("OK")),
-                                          // Text("Oke"),
-                                        ],
-                                        actionsAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                      );
-                                    },
-                                  );
-                                }
-                              : null,
-                          child: TextFormField(
-                              controller: intervalController,
-                              keyboardType: TextInputType.number,
-                              // enabled: isPengingat,
-                              enabled: false,
-                              onTap: () {
-                                FocusScope.of(context).unfocus();
-                              },
-                              validator: (val) {
-                                if ((val ?? "").isEmpty && isPengingat) {
-                                  return "Field ini tidak boleh kosong";
-                                }
-                                return null;
-                              },
-                              decoration: const InputDecoration(
-                                  label: Text("Interval Pengingat"))),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: Row(children: [
+                            Text("Interval Reminder")
+                          ],),
+                        ),
+                        Row(
+                          children: [
+                            DropdownButton<int>(
+                                value: reminderIntervalInMinute,
+                                items: const [
+                                  DropdownMenuItem(child: Text("Tidak Ada"),value: 0,),
+                                  DropdownMenuItem(child: Text("1 Hari Sebelumnya"),value: 60*24,),
+                                  DropdownMenuItem(child: Text("3 Jam Sebelumnya"),value: 180,),
+                                  DropdownMenuItem(child: Text("1 Jam Sebelumnya"),value: 60,),
+                                ], onChanged: (val){
+                                  reminderIntervalInMinute = val ?? 0;
+                                  myToast("reminderIntervalInMinute: $reminderIntervalInMinute");
+                            }),
+                          ],
                         ),
                         Row(
                           children: const [
@@ -307,7 +196,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                   description: descController.text,
                                   waktuPengingat:
                                       isPengingat ? dateTimePengingat : null,
-                                  intervalPengingat: reminderInterval,
+                                  intervalPengingat: reminderIntervalInMinute * 60,
                                   // intervalController.text.isNotEmpty ?
                                   //     int.parse(intervalController.text) : null,
                                   lampiran: filePath,
@@ -319,6 +208,7 @@ class _AddOrEditNotesScreenState extends State<AddOrEditNotesScreen> {
                                     : context
                                         .read<CatatanCubit>()
                                         .editCatatan(responseToSend);
+                                myToast("Reminder in ${durationMinuteToHumanReadable(reminderIntervalInMinute)}");
                                 Navigator.of(context).pop();
                               } else {}
                             },
